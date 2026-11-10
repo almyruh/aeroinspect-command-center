@@ -20,9 +20,9 @@ interface Current {
 }
 
 function fromSample(i: number): Current {
-  const s = SAMPLE_INSPECTIONS[i];
+  const s = SAMPLE_INSPECTIONS[i] ?? SAMPLE_INSPECTIONS[0]!;
   return {
-    image: s.image!,
+    image: s.image ?? "",
     defects: s.defects,
     uploaded: false,
     meta: { id: s.id, component: s.component, partNumber: s.partNumber, serial: s.serial, durationSec: s.durationSec },

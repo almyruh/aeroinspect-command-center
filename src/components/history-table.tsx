@@ -14,11 +14,11 @@ export function formatUtc(iso: string) {
 export function HistoryTable({ rows }: { rows: Inspection[] }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[860px] text-sm">
+      <table className="w-full min-w-[1080px] text-sm">
         <thead>
           <tr className="border-b border-border text-left">
             {["Inspection", "Component", "Aircraft / Engine", "Defects", "Max conf.", "Inspector", "Date", "Status"].map((h) => (
-              <th key={h} className="eyebrow px-4 py-2.5 font-normal">
+              <th key={h} className="eyebrow whitespace-nowrap px-4 py-2.5 font-normal">
                 {h}
               </th>
             ))}
@@ -29,7 +29,7 @@ export function HistoryTable({ rows }: { rows: Inspection[] }) {
             const max = r.defects.length ? Math.max(...r.defects.map((d) => d.confidence)) : null;
             return (
               <tr key={r.id} className="border-b border-border/60 transition-colors last:border-0 hover:bg-surface-raised/60">
-                <td className="px-4 py-3 font-mono text-xs text-primary">{r.id}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-primary">{r.id}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     {r.image ? (
@@ -39,16 +39,16 @@ export function HistoryTable({ rows }: { rows: Inspection[] }) {
                     )}
                     <div className="min-w-0">
                       <p className="truncate font-medium">{r.component}</p>
-                      <p className="font-mono text-[11px] text-muted-foreground">{r.partNumber} · {r.serial}</p>
+                      <p className="whitespace-nowrap font-mono text-[11px] text-muted-foreground">{r.partNumber} · {r.serial}</p>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">{r.aircraft}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-xs text-muted-foreground">{r.aircraft}</td>
                 <td className="px-4 py-3">
                   {r.defects.length === 0 ? (
                     <span className="text-xs text-muted-foreground">None</span>
                   ) : (
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex gap-1">
                       {r.defects.map((d) => (
                         <span
                           key={d.id}
@@ -65,8 +65,8 @@ export function HistoryTable({ rows }: { rows: Inspection[] }) {
                   )}
                 </td>
                 <td className="px-4 py-3 font-mono text-xs">{max ? `${Math.round(max * 100)}%` : "—"}</td>
-                <td className="px-4 py-3 text-xs">{r.inspector}</td>
-                <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                <td className="whitespace-nowrap px-4 py-3 text-xs">{r.inspector}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-muted-foreground">
                   {formatUtc(r.date)}
                 </td>
                 <td className="px-4 py-3">
