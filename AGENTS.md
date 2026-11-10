@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- All inspection sample data lives in `src/lib/inspection-data.ts`; UI reads only from there so a real detection backend can replace it in one place.
+- App shell (sidebar + header) wraps `<Outlet />` in `src/routes/__root.tsx`; pages render content only.
+- Defect bounding boxes are stored as percentages of image size so overlays scale with the preview.
