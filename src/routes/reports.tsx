@@ -153,7 +153,7 @@ function ReportsPage() {
                   stackId="d"
                   name={DEFECT_META[t].label}
                   fill={DEFECT_META[t].colorVar}
-                  radius={i === DEFECT_TYPES.length - 1 ? [0, 3, 3, 0] : undefined}
+                  radius={i === DEFECT_TYPES.length - 1 ? [0, 3, 3, 0] : 0}
                 />
               ))}
             </BarChart>
