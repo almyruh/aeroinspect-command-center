@@ -1,15 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/page-header";
-import { DemoBanner } from "@/components/demo-notice";
-import { InspectionWorkspace } from "@/components/inspection/inspection-workspace";
+import { LiveInspection } from "@/components/live/live-inspection";
+import { LiveHistory } from "@/components/live/live-history";
+import { ServiceStatus } from "@/components/live/service-status";
 
 export const Route = createFileRoute("/inspections/new")({
   head: () => ({
     meta: [
       { title: "New Inspection · AeroInspect AI" },
-      { name: "description", content: "Upload an aerospace component image and review flagged surface defects." },
+      { name: "description", content: "Upload an aerospace component image, run edge-detection inspection and compare original and annotated views." },
       { property: "og:title", content: "New Inspection · AeroInspect AI" },
-      { property: "og:description", content: "Upload an aerospace component image and review flagged surface defects." },
+      { property: "og:description", content: "Upload an aerospace component image, run edge-detection inspection and compare original and annotated views." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/inspections/new")({
   component: NewInspection,
 });
 
-const STEPS = ["Image intake", "Pre-processing", "Defect screening", "Disposition"];
+const STEPS = ["Image intake", "Edge detection", "Candidate review", "CSV report"];
 
 function NewInspection() {
   return (
@@ -25,9 +26,9 @@ function NewInspection() {
       <PageHeader
         eyebrow="Inspection workflow"
         title="New Inspection"
-        description="Load a component image to screen for cracks, corrosion, dents and scratches."
+        description="Load a component image to flag candidate regions for cracks, corrosion, dents and scratches."
       />
-      <DemoBanner />
+      <ServiceStatus />
       <ol className="grid grid-cols-2 gap-2 md:grid-cols-4">
         {STEPS.map((s, i) => (
           <li key={s} className="panel flex items-center gap-3 px-4 py-3">
@@ -38,7 +39,8 @@ function NewInspection() {
           </li>
         ))}
       </ol>
-      <InspectionWorkspace initialSample={null} />
+      <LiveInspection />
+      <LiveHistory limit={5} />
     </div>
   );
 }

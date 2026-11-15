@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
 import { DemoBadge } from "@/components/demo-notice";
 import { HistoryTable } from "@/components/history-table";
+import { LiveHistory } from "@/components/live/live-history";
 import { INSPECTION_HISTORY, type InspectionStatus } from "@/lib/inspection-data";
 
 export const Route = createFileRoute("/history")({
@@ -43,13 +43,13 @@ function HistoryPage() {
       <PageHeader
         eyebrow="Records"
         title="Inspection History"
-        description="All recorded inspections with findings and disposition status."
-        actions={
-          <Button variant="panel" disabled title="Export not available in prototype">
-            <Download /> Export CSV
-          </Button>
-        }
+        description="Inspections run from this browser, plus illustrative sample records."
       />
+      <LiveHistory />
+      <div className="mt-2 flex items-center gap-3">
+        <h2 className="font-display text-xl font-semibold">Sample records</h2>
+        <DemoBadge label="Illustrative only" />
+      </div>
       <section className="panel">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-3">
           <div className="flex items-center gap-3">
