@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useHydrated, useRouterState } from "@tanstack/react-router";
 import { BarChart3, FileText, History, LayoutDashboard, ScanSearch, Settings } from "lucide-react";
 import {
   Sidebar,
@@ -14,6 +14,32 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { AeroLogo } from "@/components/aero-logo";
+import { useApiBaseUrl } from "@/hooks/use-api-base-url";
+import { cn } from "@/lib/utils";
+
+function ServiceFooter({ collapsed }: { collapsed: boolean }) {
+  const hydrated = useHydrated();
+  const url = useApiBaseUrl();
+  const on = hydrated && !!url;
+  const dot = cn("size-2 rounded-full", on ? "bg-primary" : "bg-warning animate-blink");
+  if (collapsed) return <span className={cn("mx-auto", dot)} />;
+  return (
+    <div className="rounded-md border border-sidebar-border bg-background/40 p-3">
+      <div className="flex items-center gap-2">
+        <span className={dot} />
+        <p className={cn("font-mono text-[10px] uppercase tracking-[0.14em]", on ? "text-primary" : "text-warning")}>
+          {on ? "Service configured" : "Service not set"}
+        </p>
+      </div>
+      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+        Edge-detection screening. Results are candidate regions, not validated defects.
+      </p>
+      <div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <FileText className="size-3" /> Build 0.2 · MVP
+      </div>
+    </div>
+  );
+}
 
 const primary = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -99,24 +125,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-3">
-        {!collapsed ? (
-          <div className="rounded-md border border-sidebar-border bg-background/40 p-3">
-            <div className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-warning animate-blink" />
-              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-warning">
-                Demo mode
-              </p>
-            </div>
-            <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-              Vision model not connected. Results use sample data.
-            </p>
-            <div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <FileText className="size-3" /> Build 0.1 · Prototype
-            </div>
-          </div>
-        ) : (
-          <span className="mx-auto size-2 rounded-full bg-warning animate-blink" />
-        )}
+        <ServiceFooter collapsed={collapsed} />
       </SidebarFooter>
     </Sidebar>
   );

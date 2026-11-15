@@ -3,14 +3,20 @@ import { ImageUp, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-const ACCEPT = ["image/jpeg", "image/png", "image/webp", "image/tiff"];
+const DEFAULT_ACCEPT = ["image/jpeg", "image/png", "image/webp", "image/tiff"];
 
 export function UploadZone({
   onFile,
   compact = false,
+  accept = DEFAULT_ACCEPT,
+  acceptLabel = "JPG, PNG, WEBP or TIFF",
+  disabled = false,
 }: {
   onFile: (file: File) => void;
   compact?: boolean;
+  accept?: readonly string[];
+  acceptLabel?: string;
+  disabled?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -19,9 +25,9 @@ export function UploadZone({
   const handle = useCallback(
     (files: FileList | null) => {
       const file = files?.[0];
-      if (!file) return;
-      if (!ACCEPT.includes(file.type)) {
-        setError("Unsupported file. Use JPG, PNG, WEBP or TIFF.");
+      if (!file || disabled) return;
+      if (!accept.includes(file.type)) {
+        setError(`Unsupported file. Use ${acceptLabel}.`);
         return;
       }
       if (file.size > 25 * 1024 * 1024) {
@@ -31,14 +37,14 @@ export function UploadZone({
       setError(null);
       onFile(file);
     },
-    [onFile],
+    [onFile, accept, acceptLabel, disabled],
   );
 
   return (
     <div
       onDragOver={(e) => {
         e.preventDefault();
-        setDragging(true);
+        if (!disabled) setDragging(true);
       }}
       onDragLeave={() => setDragging(false)}
       onDrop={(e) => {
@@ -55,7 +61,7 @@ export function UploadZone({
       <input
         ref={inputRef}
         type="file"
-        accept={ACCEPT.join(",")}
+        accept={accept.join(",")}
         className="hidden"
         onChange={(e) => {
           handle(e.target.files);
@@ -75,11 +81,16 @@ export function UploadZone({
           {dragging ? "Release to load component image" : "Drag & drop a component image"}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          JPG, PNG, WEBP or TIFF up to 25 MB · Borescope, macro and hangar captures supported
+          {acceptLabel} up to 25 MB · Borescope, macro and hangar captures supported
         </p>
         {error && <p className="mt-2 text-xs font-medium text-destructive">{error}</p>}
       </div>
-      <Button variant={compact ? "panel" : "signal"} size={compact ? "sm" : "default"} onClick={() => inputRef.current?.click()}>
+      <Button
+        variant={compact ? "panel" : "signal"}
+        size={compact ? "sm" : "default"}
+        disabled={disabled}
+        onClick={() => inputRef.current?.click()}
+      >
         Browse files
       </Button>
     </div>

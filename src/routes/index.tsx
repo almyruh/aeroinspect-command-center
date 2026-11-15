@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 import { DemoBadge, DemoBanner } from "@/components/demo-notice";
 import { StatCards } from "@/components/stat-cards";
-import { InspectionWorkspace } from "@/components/inspection/inspection-workspace";
+import { LiveInspection } from "@/components/live/live-inspection";
+import { LiveHistory } from "@/components/live/live-history";
+import { ServiceStatus } from "@/components/live/service-status";
 import { HistoryTable } from "@/components/history-table";
 import { INSPECTION_HISTORY } from "@/lib/inspection-data";
 
@@ -12,9 +14,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Dashboard · AeroInspect AI" },
-      { name: "description", content: "Overview of aerospace component inspections, defect findings and pass/fail status." },
+      { name: "description", content: "Upload aerospace component images, run edge-detection inspection and review candidate defect regions." },
       { property: "og:title", content: "Dashboard · AeroInspect AI" },
-      { property: "og:description", content: "Overview of aerospace component inspections, defect findings and pass/fail status." },
+      { property: "og:description", content: "Upload aerospace component images, run edge-detection inspection and review candidate defect regions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -26,9 +28,9 @@ function Dashboard() {
   return (
     <div className="mx-auto flex max-w-[1600px] flex-col gap-6">
       <PageHeader
-        eyebrow="Operations overview · Last 30 days"
+        eyebrow="Operations overview"
         title="Inspection Dashboard"
-        description="Surface defect screening for turbine, airframe and landing gear components."
+        description="Screen turbine, airframe and landing gear images for candidate surface defects."
         actions={
           <Button variant="signal" asChild>
             <Link to="/inspections/new">
@@ -37,14 +39,20 @@ function Dashboard() {
           </Button>
         }
       />
+      <ServiceStatus />
+      <LiveInspection />
+      <LiveHistory limit={5} />
+
+      <div className="mt-4 flex items-center gap-3">
+        <h2 className="font-display text-xl font-semibold">Fleet overview</h2>
+        <DemoBadge label="Sample data" />
+      </div>
       <DemoBanner />
       <StatCards />
-      <InspectionWorkspace initialSample={0} />
-
       <section className="panel">
         <div className="flex items-center justify-between border-b border-border px-5 py-3">
           <div className="flex items-center gap-3">
-            <h2 className="font-display text-lg font-semibold">Recent inspections</h2>
+            <h2 className="font-display text-lg font-semibold">Sample inspection records</h2>
             <DemoBadge />
           </div>
           <Button variant="ghost" size="sm" asChild>

@@ -1,21 +1,19 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { PageHeader } from "@/components/page-header";
-import { DEFECT_META, DEFECT_TYPES, type DefectType } from "@/lib/inspection-data";
+import { ServiceSettings } from "@/components/live/service-settings";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
       { title: "Settings · AeroInspect AI" },
-      { name: "description", content: "Configure detection thresholds, notifications and station details." },
+      { name: "description", content: "Configure the inspection service address, station details and notifications." },
       { property: "og:title", content: "Settings · AeroInspect AI" },
-      { property: "og:description", content: "Configure detection thresholds, notifications and station details." },
+      { property: "og:description", content: "Configure the inspection service address, station details and notifications." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -36,57 +34,21 @@ function Section({ title, sub, children }: { title: string; sub: string; childre
 }
 
 function SettingsPage() {
-  const [thresholds, setThresholds] = useState<Record<DefectType, number>>({
-    crack: 60,
-    corrosion: 70,
-    dent: 70,
-    scratch: 75,
-  });
-
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <PageHeader
         eyebrow="Configuration"
         title="Settings"
-        description="Preferences are kept in this session only — nothing is saved in the prototype."
+        description="The service address is saved in this browser. Other preferences are kept for this session only."
         actions={
-          <Button variant="signal" onClick={() => toast.success("Settings applied for this session (prototype — not saved)")}>
+          <Button variant="signal" onClick={() => toast.success("Station and notification preferences applied for this session")}>
             Save changes
           </Button>
         }
       />
 
-      <Section title="Detection model" sub="The vision model that screens uploaded images.">
-        <div className="flex items-center justify-between rounded-md border border-warning/40 bg-warning/5 p-4">
-          <div>
-            <p className="font-medium">No model connected</p>
-            <p className="text-xs text-muted-foreground">Running in demonstration mode with sample results.</p>
-          </div>
-          <Button variant="panel" size="sm" disabled>
-            Connect model
-          </Button>
-        </div>
-      </Section>
-
-      <Section title="Confidence thresholds" sub="Minimum confidence required to flag a region, per defect category.">
-        {DEFECT_TYPES.map((t) => (
-          <div key={t}>
-            <div className="mb-2 flex items-center justify-between">
-              <Label className="flex items-center gap-2">
-                <span className={`size-2.5 rounded-[2px] ${DEFECT_META[t].bgClass}`} />
-                {DEFECT_META[t].label}
-              </Label>
-              <span className="font-mono text-xs text-primary">{thresholds[t]}%</span>
-            </div>
-            <Slider
-              value={[thresholds[t]]}
-              min={30}
-              max={99}
-              step={1}
-              onValueChange={([v]) => setThresholds((s) => ({ ...s, [t]: v }))}
-            />
-          </div>
-        ))}
+      <Section title="Inspection service" sub="Address of the image inspection service that receives uploads.">
+        <ServiceSettings />
       </Section>
 
       <Section title="Station" sub="Shown on inspection records and reports.">
