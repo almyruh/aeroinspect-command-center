@@ -102,8 +102,8 @@ function dims(o: Obj): { width: number | null; height: number | null } {
       if (key) [height, width] = [a ?? null, b ?? null];
       else [width, height] = [a ?? null, b ?? null];
     } else if (typeof d === "object") {
-      width ??= num((d as Obj).width ?? (d as Obj).w);
-      height ??= num((d as Obj).height ?? (d as Obj).h);
+      width ??= num((d as Obj)["width"] ?? (d as Obj)["w"]);
+      height ??= num((d as Obj)["height"] ?? (d as Obj)["h"]);
     } else if (typeof d === "string") {
       const m = d.match(/(\d+)\s*[x×,]\s*(\d+)/i);
       if (m) [width, height] = [Number(m[1]), Number(m[2])];
@@ -155,9 +155,9 @@ export function normalizeInspectResponse(raw: unknown, fallbackName: string): In
 
 function detailFrom(body: unknown): string | null {
   if (!body || typeof body !== "object") return null;
-  const d = (body as Obj).detail ?? (body as Obj).message ?? (body as Obj).error;
+  const d = (body as Obj)["detail"] ?? (body as Obj)["message"] ?? (body as Obj)["error"];
   if (typeof d === "string") return d;
-  if (Array.isArray(d)) return d.map((x) => (x && typeof x === "object" ? String((x as Obj).msg ?? "") : String(x))).filter(Boolean).join("; ") || null;
+  if (Array.isArray(d)) return d.map((x) => (x && typeof x === "object" ? String((x as Obj)["msg"] ?? "") : String(x))).filter(Boolean).join("; ") || null;
   return null;
 }
 
