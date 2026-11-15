@@ -64,7 +64,7 @@ export function ServiceSettings() {
             spellCheck={false}
           />
           <Button variant="signal" onClick={save} disabled={invalid}>
-            Save
+            Save address
           </Button>
           <Button variant="panel" onClick={test} disabled={!candidate || invalid || check.state === "checking"}>
             {check.state === "checking" && <Loader2 className="animate-spin" />}
