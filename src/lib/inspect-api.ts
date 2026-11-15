@@ -38,7 +38,7 @@ export function cleanBaseUrl(url: string | undefined | null): string {
 }
 
 export function getEnvBaseUrl(): string {
-  return cleanBaseUrl(import.meta.env.VITE_API_BASE_URL as string | undefined);
+  return cleanBaseUrl(import.meta.env.VITE_API_BASE_URL);
 }
 
 export function getOverrideBaseUrl(): string {
