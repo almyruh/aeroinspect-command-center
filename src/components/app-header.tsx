@@ -21,7 +21,7 @@ export function AppHeader() {
             className="h-8 w-64 border-border bg-surface pl-8 text-xs"
           />
         </div>
-        <DemoBadge label="Demo mode" />
+        <DemoBadge label="Candidate detection" />
         <button
           type="button"
           aria-label="Notifications"
