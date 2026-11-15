@@ -50,7 +50,7 @@ export function LiveHistory({ limit }: { limit?: number }) {
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[820px] text-sm">
+          <table className="w-full min-w-[960px] text-sm">
             <thead>
               <tr className="border-b border-border text-left">
                 {["Inspection", "File", "Dimensions", "Candidate regions", "Brightness", "Edge ratio", "Status", ""].map((h) => (
@@ -64,16 +64,16 @@ export function LiveHistory({ limit }: { limit?: number }) {
               {rows.map((r) => (
                 <tr key={r.id} className="border-b border-border/60 last:border-0 hover:bg-surface/60">
                   <td className="px-5 py-3">
-                    <p className="font-mono text-xs font-semibold">{r.id}</p>
+                    <p className="whitespace-nowrap font-mono text-xs font-semibold">{r.id}</p>
                     <p className="text-[11px] text-muted-foreground">{when(r.inspectedAt)}</p>
                   </td>
                   <td className="max-w-[220px] truncate px-5 py-3" title={r.filename}>
                     {r.filename}
                   </td>
-                  <td className="px-5 py-3 font-mono text-xs">{formatDims(r)}</td>
-                  <td className="px-5 py-3 font-mono text-xs">{r.totalRegions ?? "—"}</td>
-                  <td className="px-5 py-3 font-mono text-xs">{formatBrightness(r.meanBrightness)}</td>
-                  <td className="px-5 py-3 font-mono text-xs">{formatRatio(r.edgePixelRatio)}</td>
+                  <td className="whitespace-nowrap px-5 py-3 font-mono text-xs">{formatDims(r)}</td>
+                  <td className="whitespace-nowrap px-5 py-3 font-mono text-xs">{r.totalRegions ?? "—"}</td>
+                  <td className="whitespace-nowrap px-5 py-3 font-mono text-xs">{formatBrightness(r.meanBrightness)}</td>
+                  <td className="whitespace-nowrap px-5 py-3 font-mono text-xs">{formatRatio(r.edgePixelRatio)}</td>
                   <td className="px-5 py-3">
                     <Badge variant={TONE[statusTone(r.status, r.totalRegions)]} className={cn("max-w-[180px] truncate font-mono text-[10px]")}>
                       {r.status}

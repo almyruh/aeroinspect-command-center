@@ -30,6 +30,8 @@ use the editor.
 <!-- LOVABLE:END -->
 
 ## Project rules
-- All inspection sample data lives in `src/lib/inspection-data.ts`; UI reads only from there so a real detection backend can replace it in one place.
+- Illustrative sample data (fleet stats, sample records, reports) lives in `src/lib/inspection-data.ts`; keep it separate from live results.
+- All calls to the external inspection service go through `src/lib/inspect-api.ts` (base URL: Settings override in localStorage, else `VITE_API_BASE_URL`; never hardcode a host) so response-shape changes are handled in one normaliser.
+- Live inspection history is stored per-browser in localStorage via `src/lib/inspection-log.ts` (metadata only, no images) because there is no database yet.
 - App shell (sidebar + header) wraps `<Outlet />` in `src/routes/__root.tsx`; pages render content only.
 - Defect bounding boxes are stored as percentages of image size so overlays scale with the preview.
