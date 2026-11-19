@@ -78,6 +78,40 @@ describe("inspection service client", () => {
     const r = normalizeInspectResponse({ image_dimensions: { width: 640, height: 480 } }, "a.png");
     expect([r.width, r.height]).toEqual([640, 480]);
   });
+
+  it("maps edge_detection.total_regions, preferring it over legacy fields", () => {
+    const r = normalizeInspectResponse({ edge_detection: { total_regions: 7 }, total_regions: 99 }, "blade.png");
+    expect(r.totalRegions).toBe(7);
+  });
+
+  it("maps image_analysis.mean_brightness, preferring it over legacy fields", () => {
+    const r = normalizeInspectResponse({ image_analysis: { mean_brightness: 112.4 }, mean_brightness: 99 }, "blade.png");
+    expect(r.meanBrightness).toBe(112.4);
+  });
+
+  it("maps image_analysis.edge_pixel_ratio, preferring it over legacy fields", () => {
+    const r = normalizeInspectResponse({ image_analysis: { edge_pixel_ratio: 0.0412 }, edge_pixel_ratio: 0.99 }, "blade.png");
+    expect(r.edgePixelRatio).toBe(0.0412);
+  });
+
+  it("preserves zero metrics and parses numeric strings in nested responses", () => {
+    const r = normalizeInspectResponse({
+      edge_detection: { total_regions: 0 },
+      image_analysis: { mean_brightness: "0", edge_pixel_ratio: 0 },
+      total_regions: 99, mean_brightness: 99, edge_pixel_ratio: 0.99,
+    }, "blade.png");
+    expect([r.totalRegions, r.meanBrightness, r.edgePixelRatio]).toEqual([0, 0, 0]);
+  });
+
+  it("does not invent missing or malformed nested metrics", () => {
+    for (const raw of [{}, { edge_detection: null, image_analysis: [] }, {
+      edge_detection: { total_regions: "unknown" },
+      image_analysis: { mean_brightness: "", edge_pixel_ratio: "unknown" },
+    }]) {
+      const r = normalizeInspectResponse(raw, "blade.png");
+      expect([r.totalRegions, r.meanBrightness, r.edgePixelRatio]).toEqual([null, null, null]);
+    }
+  });
 });
 
 describe("CSV report", () => {

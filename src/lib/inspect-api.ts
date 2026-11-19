@@ -79,6 +79,10 @@ export function inspectEndpoint(base: string): string {
 
 type Obj = Record<string, unknown>;
 
+function object(v: unknown): Obj {
+  return v !== null && typeof v === "object" && !Array.isArray(v) ? v as Obj : {};
+}
+
 function num(v: unknown): number | null {
   if (typeof v === "number" && Number.isFinite(v)) return v;
   if (typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v))) return Number(v);
@@ -124,6 +128,8 @@ export function toJpegDataUrl(b64: unknown): string | null {
 export function normalizeInspectResponse(raw: unknown, fallbackName: string): InspectResult {
   if (!raw || typeof raw !== "object") throw new InspectError("The inspection service returned an unexpected response.", "parse");
   const o = raw as Obj;
+  const edgeDetection = object(o["edge_detection"]);
+  const imageAnalysis = object(o["image_analysis"]);
   const regionsVal = pick(o, [
     "total_detected_regions",
     "total_regions",
@@ -134,7 +140,7 @@ export function normalizeInspectResponse(raw: unknown, fallbackName: string): In
     "region_count",
     "regions",
   ]);
-  const totalRegions = Array.isArray(regionsVal) ? regionsVal.length : num(regionsVal);
+  const totalRegions = num(edgeDetection["total_regions"]) ?? (Array.isArray(regionsVal) ? regionsVal.length : num(regionsVal));
   const { width, height } = dims(o);
   const status = pick(o, ["inspection_status", "status", "result"]);
   const warning = pick(o, ["warning", "disclaimer", "note"]);
@@ -143,8 +149,8 @@ export function normalizeInspectResponse(raw: unknown, fallbackName: string): In
     width,
     height,
     totalRegions,
-    meanBrightness: num(pick(o, ["mean_brightness", "brightness", "avg_brightness"])),
-    edgePixelRatio: num(pick(o, ["edge_pixel_ratio", "edge_ratio", "edge_density"])),
+    meanBrightness: num(imageAnalysis["mean_brightness"]) ?? num(pick(o, ["mean_brightness", "brightness", "avg_brightness"])),
+    edgePixelRatio: num(imageAnalysis["edge_pixel_ratio"]) ?? num(pick(o, ["edge_pixel_ratio", "edge_ratio", "edge_density"])),
     status: typeof status === "string" && status.trim() ? status.trim() : "Unknown",
     warning: typeof warning === "string" && warning.trim() ? warning.trim() : null,
     annotatedImage: toJpegDataUrl(pick(o, ["annotated_image", "annotated_image_base64", "annotated", "image_base64"])),

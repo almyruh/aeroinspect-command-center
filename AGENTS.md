@@ -31,7 +31,7 @@ use the editor.
 
 ## Project rules
 - Illustrative sample data (fleet stats, sample records, reports) lives in `src/lib/inspection-data.ts`; keep it separate from live results.
-- All calls to the external inspection service go through `src/lib/inspect-api.ts` (base URL: Settings override in localStorage, else `VITE_API_BASE_URL`; never hardcode a host) so response-shape changes are handled in one normaliser.
+- All calls to the external inspection service go through `src/lib/inspect-api.ts` (base URL: Settings override in localStorage, else `VITE_API_BASE_URL`; never hardcode a host); its normaliser prefers nested `edge_detection.total_regions` and `image_analysis` metrics with legacy flat-field fallbacks so every live view and export uses the same response mapping.
 - Live inspection history is stored per-browser in localStorage via `src/lib/inspection-log.ts` (metadata only, no images) because there is no database yet.
 - App shell (sidebar + header) wraps `<Outlet />` in `src/routes/__root.tsx`; pages render content only.
 - Defect bounding boxes are stored as percentages of image size so overlays scale with the preview.
