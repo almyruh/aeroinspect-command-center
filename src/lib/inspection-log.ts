@@ -42,9 +42,32 @@ function write(list: LoggedInspection[]) {
   window.dispatchEvent(new Event(EVT));
 }
 
-export function makeInspectionId(d: Date = new Date()): string {
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `LIVE-${d.getUTCFullYear()}${p(d.getUTCMonth() + 1)}${p(d.getUTCDate())}-${p(d.getUTCHours())}${p(d.getUTCMinutes())}${p(d.getUTCSeconds())}`;
+export function makeInspectionId(): string {
+  // Timestamps alone collide when separate inspections finish in the same second.
+  return `LIVE-${crypto.randomUUID()}`;
+}
+
+/** One immutable metadata snapshot shared by the live view, history and CSV. */
+export function createLoggedInspection(
+  result: InspectResult,
+  file: Pick<File, "size">,
+  serviceUrl: string,
+  inspectedAt: Date = new Date(),
+): LoggedInspection {
+  return {
+    id: makeInspectionId(),
+    inspectedAt: inspectedAt.toISOString(),
+    fileSizeBytes: file.size,
+    serviceUrl,
+    filename: result.filename,
+    width: result.width,
+    height: result.height,
+    totalRegions: result.totalRegions,
+    meanBrightness: result.meanBrightness,
+    edgePixelRatio: result.edgePixelRatio,
+    status: result.status,
+    warning: result.warning,
+  };
 }
 
 export function logInspection(entry: LoggedInspection) {

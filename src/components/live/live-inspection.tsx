@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { UploadZone } from "@/components/inspection/upload-zone";
 import { useApiBaseUrl } from "@/hooks/use-api-base-url";
 import { ACCEPTED_LABEL, ACCEPTED_TYPES, InspectError, inspectImage, type InspectResult } from "@/lib/inspect-api";
-import { logInspection, makeInspectionId, type LoggedInspection } from "@/lib/inspection-log";
+import { createLoggedInspection, logInspection, type LoggedInspection } from "@/lib/inspection-log";
 import { downloadCsv, inspectionsToCsv, reportFilename } from "@/lib/csv-report";
 import { CandidateNotice } from "./candidate-notice";
 import { ImageCompare } from "./image-compare";
@@ -62,21 +62,19 @@ export function LiveInspection() {
     setPhase("inspecting");
     setError(null);
     setResult(null);
+    setEntry(null);
     try {
       const r = await inspectImage(file, { baseUrl, signal: ctrl.signal });
       if (ctrl.signal.aborted) return;
-      const { annotatedImage: _img, ...meta } = r;
-      const e: LoggedInspection = {
-        ...meta,
-        id: makeInspectionId(),
-        inspectedAt: new Date().toISOString(),
-        fileSizeBytes: file.size,
-        serviceUrl: baseUrl,
-      };
-      logInspection(e);
+      const e = createLoggedInspection(r, file, baseUrl);
       setResult(r);
       setEntry(e);
       setPhase("done");
+      try {
+        logInspection(e);
+      } catch {
+        toast.error("Inspection completed, but browser history could not be saved. Download the CSV report to keep this result.");
+      }
       toast.success(`Inspection complete · ${r.totalRegions ?? "?"} candidate region${r.totalRegions === 1 ? "" : "s"}`);
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
@@ -186,7 +184,7 @@ export function LiveInspection() {
             </div>
           ) : result ? (
             <>
-              <MetricGrid result={result} />
+              <MetricGrid result={entry ?? result} />
               {entry && <p className="mt-3 font-mono text-[11px] text-muted-foreground">{entry.id} · {result.filename}</p>}
             </>
           ) : (
