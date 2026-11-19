@@ -103,6 +103,20 @@ describe("inspection service client", () => {
     expect([r.totalRegions, r.meanBrightness, r.edgePixelRatio]).toEqual([0, 0, 0]);
   });
 
+  it("reads the live service's exact response shape", () => {
+    const r = normalizeInspectResponse({
+      filename: "t.jpg", image_dimensions: { width: 1280, height: 896 },
+      edge_detection: { total_regions: 1, candidate_regions: [{ x: 1 }] },
+      image_analysis: { mean_brightness: 91.96, edge_pixel_ratio: 0.0175 },
+      inspection_status: "Image processed successfully",
+    }, "f");
+    expect([r.width, r.height, r.totalRegions, r.meanBrightness, r.edgePixelRatio]).toEqual([1280, 896, 1, 91.96, 0.0175]);
+  });
+
+  it("falls back to candidate_regions.length when total_regions is absent", () => {
+    expect(normalizeInspectResponse({ edge_detection: { candidate_regions: [{}, {}, {}] } }, "f").totalRegions).toBe(3);
+  });
+
   it("does not invent missing or malformed nested metrics", () => {
     for (const raw of [{}, { edge_detection: null, image_analysis: [] }, {
       edge_detection: { total_regions: "unknown" },

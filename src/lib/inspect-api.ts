@@ -140,7 +140,8 @@ export function normalizeInspectResponse(raw: unknown, fallbackName: string): In
     "region_count",
     "regions",
   ]);
-  const totalRegions = num(edgeDetection["total_regions"]) ?? (Array.isArray(regionsVal) ? regionsVal.length : num(regionsVal));
+  const candidates = edgeDetection["candidate_regions"];
+  const totalRegions = num(edgeDetection["total_regions"]) ?? (Array.isArray(candidates) ? candidates.length : null) ?? (Array.isArray(regionsVal) ? regionsVal.length : num(regionsVal));
   const { width, height } = dims(o);
   const status = pick(o, ["inspection_status", "status", "result"]);
   const warning = pick(o, ["warning", "disclaimer", "note"]);
