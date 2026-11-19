@@ -10,7 +10,7 @@ const responses = [
   { filename: "blade.png", image_dimensions: { width: 1280, height: 896 }, edge_detection: { total_regions: 1 }, image_analysis: { mean_brightness: 91.96, edge_pixel_ratio: 0.0175 }, inspection_status: "Image processed successfully", annotated_image: "abc" },
   { filename: "panel.png", image_dimensions: { width: 640, height: 480 }, edge_detection: { total_regions: 7 }, image_analysis: { mean_brightness: 112.4, edge_pixel_ratio: 0.0412 }, inspection_status: "Candidate regions detected", annotated_image: "def" },
   { filename: "gear.png", image_dimensions: { width: 800, height: 600 }, edge_detection: { total_regions: 0 }, image_analysis: { mean_brightness: 0, edge_pixel_ratio: 0 }, inspection_status: "Image processed successfully", annotated_image: "ghi" },
-];
+] as const;
 
 function entries() {
   return responses.map((response, index) => createLoggedInspection(normalizeInspectResponse(response, "fallback.png"), { size: 100 + index }, serviceUrl, timestamp));
@@ -29,6 +29,7 @@ describe("live inspection record integrity", () => {
   it.each(responses.map((response, index) => [response.filename, index] as const))("preserves every API metric for %s without annotated images", (_name, index) => {
     const record = entries()[index];
     const response = responses[index];
+    if (!record || !response) throw new Error("Missing inspection fixture");
     expect(record).toMatchObject({
       filename: response.filename, fileSizeBytes: 100 + index,
       inspectedAt: "2026-11-19T18:20:00.000Z", serviceUrl,
@@ -58,7 +59,9 @@ describe("live inspection record integrity", () => {
     const record = createLoggedInspection(result, { size: 100 }, serviceUrl, timestamp);
     logInspection(record);
     result.totalRegions = 999;
-    logInspection(entries()[1]);
+    const next = entries()[1];
+    if (!next) throw new Error("Missing second inspection fixture");
+    logInspection(next);
     const history = renderHook(() => useInspectionLog());
     expect(history.result.current.find((row) => row.id === record.id)?.totalRegions).toBe(1);
   });
@@ -67,14 +70,18 @@ describe("live inspection record integrity", () => {
     const records = entries();
     const bulk = inspectionsToCsv(records).replace("\uFEFF", "").trim().split("\r\n");
     records.forEach((record, index) => {
+      const response = responses[index];
+      if (!response) throw new Error("Missing CSV fixture");
       const individual = inspectionsToCsv([record]).replace("\uFEFF", "").trim().split("\r\n");
+      const individualRow = individual[1];
+      if (!individualRow) throw new Error("Missing CSV data row");
       expect(bulk[index + 1]).toBe(individual[1]);
-      expect(individual[1].split(",").slice(0, 10)).toEqual([
-        record.id, "2026-11-19T18:20:00.000Z", responses[index].filename,
-        String(100 + index), String(responses[index].image_dimensions.width),
-        String(responses[index].image_dimensions.height), String(responses[index].edge_detection.total_regions),
-        String(responses[index].image_analysis.mean_brightness), String(responses[index].image_analysis.edge_pixel_ratio),
-        responses[index].inspection_status,
+      expect(individualRow.split(",").slice(0, 10)).toEqual([
+        record.id, "2026-11-19T18:20:00.000Z", response.filename,
+        String(100 + index), String(response.image_dimensions.width),
+        String(response.image_dimensions.height), String(response.edge_detection.total_regions),
+        String(response.image_analysis.mean_brightness), String(response.image_analysis.edge_pixel_ratio),
+        response.inspection_status,
       ]);
     });
   });
@@ -82,12 +89,14 @@ describe("live inspection record integrity", () => {
   it("leaves missing live metrics empty in CSV instead of inventing results", () => {
     const record = createLoggedInspection(normalizeInspectResponse({ filename: "missing.png" }, "fallback.png"), { size: 12 }, serviceUrl, timestamp);
     expect([record.width, record.height, record.totalRegions, record.meanBrightness, record.edgePixelRatio]).toEqual([null, null, null, null, null]);
-    expect(inspectionsToCsv([record]).split("\r\n")[1].split(",").slice(4, 10)).toEqual(["", "", "", "", "", "Unknown"]);
+    expect(inspectionsToCsv([record]).split("\r\n")[1]?.split(",").slice(4, 10)).toEqual(["", "", "", "", "", "Unknown"]);
   });
 
   it("surfaces storage failure rather than pretending a record was saved", () => {
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new DOMException("Storage full", "QuotaExceededError"); });
-    expect(() => logInspection(entries()[0])).toThrow("Storage full");
+    const record = entries()[0];
+    if (!record) throw new Error("Missing storage fixture");
+    expect(() => logInspection(record)).toThrow("Storage full");
     expect(renderHook(() => useInspectionLog()).result.current).toEqual([]);
   });
 });

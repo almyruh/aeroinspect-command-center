@@ -3,6 +3,6 @@
 - [x] Annotated image, metrics, original vs annotated comparison
 - [x] Recent live inspection history + CSV reports
 - [x] Loading, errors, candidate-defect labelling
-- [ ] Harden individual live inspection records and verify CSV data integrity
-- [ ] Test multiple real uploads, individual/bulk CSV exports, and history after refresh
-- [ ] Run automated tests and confirm demonstration data remains separate
+- [x] Harden individual live inspection records and verify CSV data integrity
+- [x] Test multiple real uploads, individual/bulk CSV exports, and history after refresh
+- [x] Run automated tests and confirm demonstration data remains separate

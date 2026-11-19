@@ -9,7 +9,7 @@ const TONE = {
   neutral: "border-border bg-surface text-foreground",
 } as const;
 
-export function MetricGrid({ result }: { result: InspectResult }) {
+export function MetricGrid({ result }: { result: Omit<InspectResult, "annotatedImage"> }) {
   const tone = statusTone(result.status, result.totalRegions);
   const items = [
     { label: "Candidate regions", value: result.totalRegions === null ? "—" : String(result.totalRegions), icon: Hash, sub: "Edge-detected, unvalidated" },
